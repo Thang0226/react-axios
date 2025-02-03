@@ -1,40 +1,16 @@
-import logo from "./logo.svg";
-import "./App.css";
-import { Component } from "react";
-import axios from "axios";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Users from "./pages/Users";
+import UserDetails from "./pages/UserDetails";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      users: [],
-    };
-  }
-
-  componentDidMount() {
-    axios
-      .get("http://localhost:3001/api/users")
-      .then((res) => {
-        this.setState({ users: res.data });
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
-
-  render() {
-    const { users } = this.state;
-    return (
-      <div>
-        <h1>Users</h1>
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}> {user.name} </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Users />} />
+        <Route path={"/user/add"} element={<UserDetails />} />
+        <Route path={`/user/:userId`} element={<UserDetails />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App;
