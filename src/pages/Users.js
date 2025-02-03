@@ -12,25 +12,45 @@ class Users extends Component {
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-    this.getUsers()
-      .then((res) => {
-        this.setState({ users: res.data });
-      })
+    // this.setState({ loading: true });
+    // this.getUsers()
+    //   .then((res) => {
+    //     this.setState({ users: res.data });
+    //   })
+    //   .catch((err) => {
+    //     throw err;
+    //   })
+    //   .finally(() => {
+    //     this.setState({ loading: false });
+    //   });
+    const getUsers = axios.get("http://localhost:3001/api/users");
+    const getArticles = axios.get("http://localhost:3001/api/articles");
+    axios
+      .all([getUsers, getArticles])
+      .then(
+        axios.spread((result1, result2) => {
+          const users = result1.data.map((user) => {
+            return {
+              ...user,
+              article: result2.data.filter((item) => {
+                return item.user_id === user.id;
+              }),
+            };
+          });
+          this.setState({ users: users });
+        })
+      )
       .catch((err) => {
         throw err;
-      })
-      .finally(() => {
-        this.setState({ loading: false });
       });
   }
 
-  getUsers = async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
-    return await axios.get("http://localhost:3001/api/users");
-  };
+  //   getUsers = async () => {
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 2000);
+  //     });
+  //     return await axios.get("http://localhost:3001/api/users");
+  //   };
 
   handleCreate = () => {
     window.location.href = "/user/add";
@@ -40,17 +60,30 @@ class Users extends Component {
     const { loading, users } = this.state;
     if (loading) return <p>Loading...</p>;
     return (
-      <div>
+      <>
         <h1>Users</h1>
-        {users.map((user) => (
-          <div key={user.id}>
-            <Link to={`/user/${user.id}`}> {user.name} </Link>
-          </div>
-        ))}
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Number of articles</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
+                  <Link to={`/user/${user.id}`}> {user.name} </Link>
+                </td>
+                <td> {user.article.length} </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         <button type="button" onClick={this.handleCreate}>
-          Create
+          Create new user
         </button>
-      </div>
+      </>
     );
   }
 }
