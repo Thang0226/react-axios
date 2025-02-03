@@ -7,26 +7,46 @@ class Users extends Component {
     super(props);
     this.state = {
       users: [],
+      loading: false,
     };
   }
 
   componentDidMount() {
-    axios
-      .get("http://localhost:3001/api/users")
+    this.setState({ loading: true });
+    this.getUsers()
       .then((res) => {
         this.setState({ users: res.data });
       })
       .catch((err) => {
         throw err;
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
   }
+
+  getUsers = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        axios
+          .get("http://localhost:3001/api/users")
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      }, 3000);
+    });
+  };
 
   handleCreate = () => {
     window.location.href = "/user/add";
   };
 
   render() {
-    const { users } = this.state;
+    const { loading, users } = this.state;
+    if (loading) return <p>Loading...</p>;
     return (
       <div>
         <h1>Users</h1>
