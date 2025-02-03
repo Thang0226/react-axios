@@ -25,19 +25,11 @@ class Users extends Component {
       });
   }
 
-  getUsers = () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        axios
-          .get("http://localhost:3001/api/users")
-          .then((res) => {
-            resolve(res);
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      }, 3000);
+  getUsers = async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
     });
+    return await axios.get("http://localhost:3001/api/users");
   };
 
   handleCreate = () => {
